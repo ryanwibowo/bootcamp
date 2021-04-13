@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Last Transaction</title>
+</head>
+<body>
+    <h1>Last Transaction</h1>
+    <form action="#" th:object="${transactionList}">
+        <th:block th:if="${transactionList.transactions} == null">No History Transaction</th:block>
+        <table>
+            <tr>
+                <th>No</th>
+                <th>Transaction Date</th>
+                <th>Transaction Type</th>
+                <th>Amount</th>
+            </tr>
+            <tr th:each="transaction, stat : ${transactionList.transactions}">
+                <td th:text="${stat.index + 1}">No</td>
+                <td th:text="${transaction.transactionDate}">Transaction Date</td>
+                <td th:text="${transaction.transactionType}">Transaction Type</td>
+                <td th:text="${transaction.amount}">Amount</td>
+            </tr>
+        </table>
+    </form><br>
+    <form action="index.html" method="get">
+        <input type="submit" value="Logout" />
+    </form>
+</body>
+</html>

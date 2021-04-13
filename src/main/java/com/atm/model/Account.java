@@ -1,20 +1,30 @@
-package model;
+package com.atm.model;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+@Entity
 @Getter
 @Setter
 public class Account {
-    private String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
     private String name;
 
     @Digits(integer=6, fraction = 0, message = "PIN should have 6 digits length")
     private String pin;
+
     private BigDecimal balance;
 
     @Pattern(regexp = "^[0-9]+$", message = "Account Number should only contains numbers")
@@ -24,7 +34,7 @@ public class Account {
     public Account() {
         super();
     }
-    public Account(String id, String name, String pin, BigDecimal balance, String accountNumber) {
+    public Account(Long id, String name, String pin, BigDecimal balance, String accountNumber) {
         this.id = id;
         this.name = name;
         this.pin = pin;

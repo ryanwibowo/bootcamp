@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Transfer</title>
+</head>
+<body>
+    <h1>Transfer</h1>
+    <form action="#" th:action="@{/processTransfer}" th:object="${account}" method="get">
+        <table>
+            <tr><td><input type="hidden" th:field="*{accountNumber}"></td></tr>
+            <tr>
+                <td>Destination account : </td>
+                <td><input type='number' name='destinationNumber'/></td>
+            </tr>
+            <tr>
+                <td>Transfer amount : </td>
+                <td><input type='number' name='amount'/></td>
+            </tr>
+            <tr><td><input type="submit" value="Process"/></td></tr>
+        </table>
+    </form>
+</body>
+</html>

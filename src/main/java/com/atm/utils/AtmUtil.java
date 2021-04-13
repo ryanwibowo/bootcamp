@@ -1,10 +1,10 @@
-package utils;
+package com.atm.utils;
 
 import java.math.BigDecimal;
 
 public class AtmUtil {
 
-    public BigDecimal subtractBalance(BigDecimal currentBalance, BigDecimal amount) {
+    public static BigDecimal subtractBalance(BigDecimal currentBalance, BigDecimal amount) {
         return currentBalance.subtract(amount);
     }
 
