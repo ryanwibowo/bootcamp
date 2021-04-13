@@ -1,17 +1,30 @@
 package pages;
 
 import model.Account;
+import service.AccountService;
+import service.TransactionService;
 import utils.AtmUtil;
 import validation.Validation;
 
+import java.math.BigDecimal;
 import java.util.Scanner;
 
 public class FundTransferScreen {
 
+    private AccountService accountService;
+    private TransactionService transactionService;
+
+    public FundTransferScreen(AccountService accountService, TransactionService transactionService) {
+
+        this.accountService = accountService;
+        this.transactionService = transactionService;
+    }
+
     public void process(Account account) {
-        FundTransferSummary fundTransferSummary = new FundTransferSummary();
+        FundTransferSummary fundTransferSummary = new FundTransferSummary(accountService, transactionService);
         AtmUtil util = new AtmUtil();
         Validation validate = new Validation();
+        LoginScreen loginScreen = new LoginScreen(accountService, transactionService);
         Scanner acc = new Scanner(System.in);
         acc.reset();
         try {
@@ -42,10 +55,10 @@ public class FundTransferScreen {
             System.out.print("Choose option[2]: ");
             switch (acc.nextLine()) {
                 case "1":
-                    fundTransferSummary.process(account, destination, amount, refNumber);
+                    fundTransferSummary.process(account, destination, new BigDecimal(amount), refNumber);
                     break;
                 default:
-                    acc.close();
+                    loginScreen.process();
                     break;
             }
         } catch (Exception e) {
