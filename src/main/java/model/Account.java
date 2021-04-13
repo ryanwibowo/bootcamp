@@ -1,16 +1,12 @@
 package model;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
+import java.util.Objects;
 
-@Data
-@ToString
 @Getter
 @Setter
 public class Account {
@@ -34,5 +30,19 @@ public class Account {
         this.pin = pin;
         this.balance = balance;
         this.accountNumber = accountNumber;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return Objects.equals(id, account.id) &&
+                Objects.equals(accountNumber, account.accountNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, accountNumber);
     }
 }

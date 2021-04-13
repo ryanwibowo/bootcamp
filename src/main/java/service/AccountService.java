@@ -1,43 +1,66 @@
 package service;
 
-import com.google.common.collect.Lists;
-import com.opencsv.bean.CsvToBean;
-import com.opencsv.bean.CsvToBeanBuilder;
 import model.Account;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Reader;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AccountService {
 
     private List<Account> accounts;
     private static AccountService instance;
 
-    public static AccountService getAccountService() {
+    public static AccountService getAccountService(String file) {
         if( instance == null) {
-            instance = new AccountService();
+            instance = new AccountService(file);
         }
         return instance;
     }
 
-    private AccountService() {
-        Account acc1 = new Account("1", "John Doe", "012108", BigDecimal.valueOf(30), "112233");
-        Account acc2 = new Account("2", "Jane Doe", "932012", BigDecimal.valueOf(30), "112244");
-        accounts = Lists.newArrayList(acc1, acc2);
+    private AccountService(String file) {
+        accounts = new ArrayList<>();
+        getAccountFromFile(file);
     }
+
     public Account getAccount(String accountNumber) throws Exception {
         return accounts.stream().filter((account -> account.getAccountNumber().equals(accountNumber)))
                 .findFirst().orElseThrow(() -> new Exception("Account not found"));
     }
 
-    public List<Account> getAccountFromFile() throws IOException {
-        Reader reader = new BufferedReader(new FileReader("d:\\Project\\account.csv"));
-        CsvToBean<Account> beans = new CsvToBeanBuilder(reader).withType(Account.class).build();
-        return beans.parse();
+    private void getAccountFromFile(String file) {
+        try (Stream<String> stream = Files.lines(Paths.get(file))) {
+            accounts = stream
+                    .map(account -> {
+                        String[] acc = account.split(",");
+                        return buildAccount(acc);
+                    })
+                    .distinct()
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            System.out.println("File not found");
+            accounts.add(new Account("1", "John Doe", "012108", BigDecimal.valueOf(30), "112233"));
+            accounts.add(new Account("2", "Jane Doe", "932012", BigDecimal.valueOf(30), "112244"));
+        }
+    }
+
+    private Account buildAccount(String[] acc) {
+        Account account = new Account();
+        account.setId(acc[0]);
+        account.setName(acc[1]);
+        account.setPin(acc[2]);
+        account.setBalance(new BigDecimal(acc[3]));
+        account.setAccountNumber(acc[4]);
+        return account;
     }
 
     public Account validateLogin(String accountNumber, String pin) throws Exception {
