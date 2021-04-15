@@ -17,9 +17,9 @@ public class Validation {
         this.accountService = accountService;
     }
 
-    public void validate(Account account, String destinationNumber, BigDecimal amount) throws Exception {
-        validateRegex(destinationNumber, amount);
-        validateAccount(account, destinationNumber);
+    public void validate(Account account, Account destinationAccount, BigDecimal amount) throws Exception {
+        validateRegex(destinationAccount.getAccountNumber(), amount);
+        validateAccount(account, destinationAccount.getAccountNumber());
         validateAmount(account.getBalance(), amount);
     }
 
@@ -60,10 +60,9 @@ public class Validation {
         isBalanceEnough(currentBalance, amount);
     }
 
-    public void validateAccount(Account account, String value) throws Exception {
-        if (account.getAccountNumber().equals(value)) {
+    public void validateAccount(Account account, String destinationNumber) throws Exception {
+        if (account.getAccountNumber().equals(destinationNumber)) {
             throw new Exception("Source and destination is same account");
         }
-        accountService.getAccount(account.getAccountNumber());
     }
 }

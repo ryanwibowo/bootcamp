@@ -9,5 +9,5 @@ import java.util.List;
 public interface TransactionService {
     Transaction processWithdraw(Account account, BigDecimal balance);
     List<Transaction> getLast10Transaction(String accountNumber);
-    Transaction processTransfer(Account account, BigDecimal amount, Account destinationAccount);
+    Transaction processTransfer(Account account, Account destinationAccount, BigDecimal amount);
 }

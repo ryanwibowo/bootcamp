@@ -31,7 +31,7 @@ public class TransactionServiceImpl implements TransactionService {
         this.accountService = accountService;
     }
 
-    public Transaction processTransfer(Account account, BigDecimal amount, Account destinationAccount) {
+    public Transaction processTransfer(Account account, Account destinationAccount, BigDecimal amount) {
         LocalDateTime date = LocalDateTime.now();
         AtmUtil util = new AtmUtil();
         BigDecimal currentBalance = util.subtractBalance(account.getBalance(), amount);
