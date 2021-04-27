@@ -16,19 +16,13 @@ import java.util.List;
 @Service
 public class TransactionServiceImpl implements TransactionService {
 
-    private List<Transaction> transactions = new ArrayList<>();
-
     private AccountRepository accountRepository;
 
     private TransactionRepository transactionRepository;
 
-    private AccountService accountService;
-
-    public TransactionServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository,
-                                  AccountService accountService) {
+    public TransactionServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
-        this.accountService = accountService;
     }
 
     public Transaction processTransfer(Account account, Account destinationAccount, BigDecimal amount) {
