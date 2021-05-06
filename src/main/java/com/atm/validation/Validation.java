@@ -1,8 +1,6 @@
 package com.atm.validation;
 
 import com.atm.model.Account;
-import com.atm.service.AccountService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -10,21 +8,10 @@ import java.math.BigDecimal;
 @Service
 public class Validation {
 
-    @Autowired
-    private AccountService accountService;
-
-    public Validation(AccountService accountService) {
-        this.accountService = accountService;
-    }
-
     public void validate(Account account, Account destinationAccount, BigDecimal amount) throws Exception {
         validateRegex(destinationAccount.getAccountNumber(), amount);
         validateAccount(account, destinationAccount.getAccountNumber());
         validateAmount(account.getBalance(), amount);
-    }
-
-    public Account validateLogin(String accountNumber, String pin) throws Exception {
-        return accountService.validateLogin(accountNumber, pin);
     }
 
     public void validateRegex(String destinationNumber, BigDecimal amount) throws Exception {

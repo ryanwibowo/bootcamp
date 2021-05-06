@@ -59,10 +59,9 @@ public class MainTests {
         BigDecimal amount = BigDecimal.valueOf(20);
         Account account = accountRepository.save(new Account(1l, "Malika", "123123",
                 BigDecimal.valueOf(30), ACCOUNT_NUMBER));
-
-        validation.isBalanceEnough(account.getBalance(), amount);
         transactionService.processWithdraw(account, amount);
-        assertEquals(account.getBalance(), BigDecimal.valueOf(10));
+        Optional<Account> account1 = accountRepository.findByAccountNumber(account.getAccountNumber());
+        assertEquals(account1.get().getBalance().intValue(), 10);
     }
 
     @Test (expected = Exception.class)
@@ -70,8 +69,6 @@ public class MainTests {
         BigDecimal amount = BigDecimal.valueOf(40);
         Account account = accountRepository.save(new Account(1l, "Malika", "123123",
                 BigDecimal.valueOf(30), ACCOUNT_NUMBER));
-
-        validation.isBalanceEnough(account.getBalance(), amount);
         transactionService.processWithdraw(account, amount);
     }
 
@@ -82,12 +79,12 @@ public class MainTests {
                 BigDecimal.valueOf(30), ACCOUNT_NUMBER));
         Account destinationAccount = accountRepository.save(new Account(2l, "Maliki", "112233",
                 BigDecimal.valueOf(30), DESTINATION_NUMBER));
+        transactionService.processTransfer(sourceAccount.getAccountNumber(), destinationAccount.getAccountNumber(), amount);
+        Optional<Account> sAccount = accountRepository.findByAccountNumber(sourceAccount.getAccountNumber());
+        Optional<Account> dAccount = accountRepository.findByAccountNumber(destinationAccount.getAccountNumber());
 
-        validation.validate(sourceAccount, destinationAccount, amount);
-        transactionService.processTransfer(sourceAccount, destinationAccount, amount);
-
-        assertEquals(sourceAccount.getBalance(), BigDecimal.valueOf(10));
-        assertEquals(destinationAccount.getBalance(), BigDecimal.valueOf(50));
+        assertEquals(sAccount.get().getBalance().intValue(), 10);
+        assertEquals(dAccount.get().getBalance().intValue(), 50);
     }
 
     @Test (expected = Exception.class)
@@ -97,9 +94,7 @@ public class MainTests {
                 BigDecimal.valueOf(30), ACCOUNT_NUMBER));
         Account destinationAccount = accountRepository.save(new Account(2l, "Maliki", "112233",
                 BigDecimal.valueOf(30), DESTINATION_NUMBER));
-
-        validation.validate(sourceAccount, destinationAccount, amount);
-        transactionService.processTransfer(sourceAccount, destinationAccount, amount);
+        transactionService.processTransfer(sourceAccount.getAccountNumber(), destinationAccount.getAccountNumber(), amount);
     }
 
     @Test (expected = Exception.class)
@@ -107,10 +102,7 @@ public class MainTests {
         BigDecimal amount = BigDecimal.valueOf(20);
         Account sourceAccount = accountRepository.save(new Account(1l, "Malika", "123123",
                 BigDecimal.valueOf(30), ACCOUNT_NUMBER));
-
-        Account destinationAccount = accountService.getAccount("111111");
-        validation.validate(sourceAccount, destinationAccount, amount);
-        transactionService.processTransfer(sourceAccount, destinationAccount, amount);
+        transactionService.processTransfer(sourceAccount.getAccountNumber(), "111111", amount);
     }
 
     @Test
@@ -118,10 +110,9 @@ public class MainTests {
         BigDecimal amount = BigDecimal.valueOf(20);
         Account account = accountRepository.save(new Account(3l, "Jane", "112244",
                 BigDecimal.valueOf(50), "123003"));
-        validation.isBalanceEnough(account.getBalance(), amount);
-        transactionService.processWithdraw(account, amount);
+        Transaction transaction = transactionService.processWithdraw(account, amount);
         List<Transaction> transactions = transactionService.getLast10Transaction(account.getAccountNumber());
-        assertEquals(account.getAccountNumber(), transactions.get(0).getAccountNumber());
+        assertEquals(transaction, transactions.get(0));
     }
 
     @Test
@@ -129,7 +120,6 @@ public class MainTests {
         BigDecimal amount = BigDecimal.valueOf(20);
         Account account = accountRepository.save(new Account(4l, "John", "112255",
                 BigDecimal.valueOf(30), "123004"));
-        validation.isBalanceEnough(account.getBalance(), amount);
         transactionService.processWithdraw(account, amount);
         transactionService.processWithdraw(account, BigDecimal.valueOf(5));
         List<Transaction> transactions = transactionService.getLast10Transaction(account.getAccountNumber());
@@ -143,20 +133,19 @@ public class MainTests {
                 BigDecimal.valueOf(100), "123005"));
         Account destinationAccount = accountRepository.save(new Account(6l, "Mickael", "112277",
                 BigDecimal.valueOf(100), "123006"));
-        validation.isBalanceEnough(account.getBalance(), amount);
         transactionService.processWithdraw(account, amount);
         transactionService.processWithdraw(account, BigDecimal.valueOf(5));
         transactionService.processWithdraw(account, BigDecimal.valueOf(15));
         transactionService.processWithdraw(account, BigDecimal.valueOf(8));
         transactionService.processWithdraw(account, BigDecimal.valueOf(7));
         transactionService.processWithdraw(account, BigDecimal.valueOf(5));
-        transactionService.processTransfer(account, destinationAccount, amount);
-        transactionService.processTransfer(account, destinationAccount, BigDecimal.valueOf(5));
-        transactionService.processTransfer(account, destinationAccount, BigDecimal.valueOf(8));
-        transactionService.processTransfer(account, destinationAccount, BigDecimal.valueOf(7));
-        transactionService.processTransfer(account, destinationAccount, BigDecimal.valueOf(5));
-        transactionService.processTransfer(account, destinationAccount, BigDecimal.valueOf(15));
-        transactionService.processTransfer(account, destinationAccount, BigDecimal.valueOf(2));
+        transactionService.processTransfer(account.getAccountNumber(), destinationAccount.getAccountNumber(), amount);
+        transactionService.processTransfer(account.getAccountNumber(), destinationAccount.getAccountNumber(), BigDecimal.valueOf(5));
+        transactionService.processTransfer(account.getAccountNumber(), destinationAccount.getAccountNumber(), BigDecimal.valueOf(8));
+        transactionService.processTransfer(account.getAccountNumber(), destinationAccount.getAccountNumber(), BigDecimal.valueOf(7));
+        transactionService.processTransfer(account.getAccountNumber(), destinationAccount.getAccountNumber(), BigDecimal.valueOf(5));
+        transactionService.processTransfer(account.getAccountNumber(), destinationAccount.getAccountNumber(), BigDecimal.valueOf(15));
+        transactionService.processTransfer(account.getAccountNumber(), destinationAccount.getAccountNumber(), BigDecimal.valueOf(2));
 
         List<Transaction> transactions = transactionService.getLast10Transaction(account.getAccountNumber());
         assertTrue(transactions.size() == 10);

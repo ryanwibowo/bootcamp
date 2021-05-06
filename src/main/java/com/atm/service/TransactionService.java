@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface TransactionService {
-    Transaction processWithdraw(Account account, BigDecimal balance);
+    Transaction processWithdraw(Account account, BigDecimal balance) throws Exception;
     List<Transaction> getLast10Transaction(String accountNumber);
-    Transaction processTransfer(Account account, Account destinationAccount, BigDecimal amount);
+    Transaction processTransfer(String accountNumber, String destinationNumber, BigDecimal amount) throws Exception;
 }

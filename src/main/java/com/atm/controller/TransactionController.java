@@ -74,11 +74,8 @@ public class TransactionController {
     @GetMapping("/processTransfer")
     public String processTransfer(@RequestParam String accountNumber, @RequestParam String destinationNumber,
                                   @RequestParam BigDecimal amount, Model attributes) throws Exception {
-        Account account = accountService.getAccount(accountNumber);
-        Account destinationAccount = accountService.getAccount(destinationNumber);
-        validation.validate(account, destinationAccount, amount);
-        Transaction transaction = transactionService.processTransfer(account, destinationAccount, amount);
-        attributes.addAttribute(account);
+        Transaction transaction = transactionService.processTransfer(accountNumber, destinationNumber, amount);
+        attributes.addAttribute(accountService.getAccount(accountNumber));
         attributes.addAttribute(transaction);
         return "transferSummary";
     }

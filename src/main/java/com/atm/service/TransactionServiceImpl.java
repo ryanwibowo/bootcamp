@@ -6,11 +6,11 @@ import com.atm.model.TransactionType;
 import com.atm.repository.AccountRepository;
 import com.atm.repository.TransactionRepository;
 import com.atm.utils.AtmUtil;
+import com.atm.validation.Validation;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,12 +20,18 @@ public class TransactionServiceImpl implements TransactionService {
 
     private TransactionRepository transactionRepository;
 
-    public TransactionServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository) {
+    private AccountService accountService;
+
+    public TransactionServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository,
+                                  AccountService accountService) {
         this.accountRepository = accountRepository;
         this.transactionRepository = transactionRepository;
+        this.accountService = accountService;
     }
 
-    public Transaction processTransfer(Account account, Account destinationAccount, BigDecimal amount) {
+    private Transaction processTransfer(Account account, Account destinationAccount, BigDecimal amount) throws Exception {
+        Validation validation = new Validation();
+        validation.validate(account, destinationAccount, amount);
         LocalDateTime date = LocalDateTime.now();
         AtmUtil util = new AtmUtil();
         BigDecimal currentBalance = util.subtractBalance(account.getBalance(), amount);
@@ -37,6 +43,13 @@ public class TransactionServiceImpl implements TransactionService {
                 account.getAccountNumber());
         return setTransactionHistory(TransactionType.FUND_TRANSFER_DEBIT, amount, date, account.getAccountNumber(),
                 destinationAccount.getAccountNumber());
+    }
+
+    @Override
+    public Transaction processTransfer(String accountNumber, String destinationNumber, BigDecimal amount) throws Exception {
+        Account account = accountService.getAccount(accountNumber);
+        Account destinationAccount = accountService.getAccount(destinationNumber);
+        return processTransfer(account, destinationAccount, amount);
     }
 
     public Transaction setTransactionHistory(TransactionType transactionType, BigDecimal balance, LocalDateTime date,
@@ -55,7 +68,9 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction processWithdraw(Account account, BigDecimal balance) {
+    public Transaction processWithdraw(Account account, BigDecimal balance) throws Exception {
+        Validation validation = new Validation();
+        validation.isBalanceEnough(account.getBalance(), balance);
         BigDecimal currentBalance = AtmUtil.subtractBalance(account.getBalance(), balance);
         account.setBalance(currentBalance);
         LocalDateTime date = LocalDateTime.now();
