@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Withdraw</title>
+</head>
+<body>
+    <h1>Select Nominal</h1>
+    <form action="#" th:action="@{/processWithdraw}" th:object="${account}" method="post">
+        <input type="hidden" th:field="*{accountNumber}">
+        <input type="hidden" name="balance" value="10">
+        <input type="submit" value="$10" />
+    </form>
+    <form action="#" th:action="@{/processWithdraw}" th:object="${account}" method="post">
+        <input type="hidden" th:field="*{accountNumber}">
+        <input type="hidden" name="balance" value="50">
+        <input type="submit" value="$50" />
+    </form>
+    <form action="#" th:action="@{/processWithdraw}" th:object="${account}" method="post">
+        <input type="hidden" th:field="*{accountNumber}">
+        <input type="hidden" name="balance" value="100">
+        <input type="submit" value="$100" />
+    </form>
+    <form action="#" th:action="@{/otherWithdraw}" th:object="${account}" method="get">
+        <input type="hidden" th:field="*{accountNumber}">
+        <input type="submit" value="Others" />
+    </form>
+</body>
+</html>

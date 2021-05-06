@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Other Withdraw</title>
+</head>
+<body>
+    <h1>Other Withdraw</h1>
+    <form action="#" th:action="@{/processWithdraw}" th:object="${account}" method="post">
+        <table>
+            <tr><td><input type="hidden" th:field="*{accountNumber}"></td></tr>
+            <tr>
+                <td>Enter amount to withdraw : </td>
+                <td><input type='number' name='balance' /></td>
+            </tr>
+            <tr><td><input type="submit" value="Process"/></td></tr>
+        </table>
+    </form>
+</body>
+</html>

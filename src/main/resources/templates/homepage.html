@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Homepage</title>
+</head>
+<body>
+    <h1>Transaction Screen</h1>
+    <form th:action="@{/withdraw}" th:object="${account}" method="get">
+        <input type="hidden" th:field="*{accountNumber}">
+        <input type="submit" value="Withdraw" />
+    </form>
+    <form th:action="@{/transfer}" th:object="${account}" method="get">
+        <input type="hidden" th:field="*{accountNumber}">
+        <input type="submit" value="Transfer" />
+    </form>
+    <form th:action="@{/lastTransaction}" th:object="${account}" method="get">
+        <input type="hidden" th:field="*{accountNumber}">
+        <input type="submit" value="Last Transaction" />
+    </form><br>
+    <form action="index.html" method="get">
+        <input type="submit" value="Logout" />
+    </form>
+</body>
+</html>
