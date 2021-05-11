@@ -1,7 +1,13 @@
 package com.atm.service;
 
 import com.atm.model.Account;
+import com.atm.model.AccountDetails;
 import com.atm.repository.AccountRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,11 +23,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class AccountServiceImpl implements AccountService {
+public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     private List<Account> accounts;
 
     private AccountRepository accountRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public AccountServiceImpl(AccountRepository accountRepository) {
         this.accountRepository = accountRepository;
@@ -61,7 +70,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = new Account();
         account.setId(new Long(acc[0]));
         account.setName(acc[1]);
-        account.setPin(acc[2]);
+        account.setPin(passwordEncoder.encode(acc[2]));
         account.setBalance(new BigDecimal(acc[3]));
         account.setAccountNumber(acc[4]);
         return account;
@@ -71,5 +80,16 @@ public class AccountServiceImpl implements AccountService {
     public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         Set<Object> seen = ConcurrentHashMap.newKeySet();
         return t -> seen.add(keyExtractor.apply(t));
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        Account account = new Account();
+        try {
+            account = getAccount(s);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new AccountDetails(account);
     }
 }

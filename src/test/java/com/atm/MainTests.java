@@ -144,7 +144,7 @@ public class MainTests {
         transactionService.processTransfer(account.getAccountNumber(), destinationAccount.getAccountNumber(), BigDecimal.valueOf(8));
         transactionService.processTransfer(account.getAccountNumber(), destinationAccount.getAccountNumber(), BigDecimal.valueOf(7));
         transactionService.processTransfer(account.getAccountNumber(), destinationAccount.getAccountNumber(), BigDecimal.valueOf(5));
-        transactionService.processTransfer(account.getAccountNumber(), destinationAccount.getAccountNumber(), BigDecimal.valueOf(15));
+        transactionService.processTransfer(account.getAccountNumber(), destinationAccount.getAccountNumber(), BigDecimal.valueOf(12));
         transactionService.processTransfer(account.getAccountNumber(), destinationAccount.getAccountNumber(), BigDecimal.valueOf(2));
 
         List<Transaction> transactions = transactionService.getLast10Transaction(account.getAccountNumber());

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Homepage</title>
+</head>
+<body>
+    <h1 th:inline="text">Homepage</h1>
+
+    <form th:action="@{/withdraw}" method="get">
+        <input type="hidden" name="accountNumber" th:value="${#httpServletRequest.remoteUser}">
+        <input type="submit" value="Withdraw" />
+    </form>
+    <form th:action="@{/transfer}" method="get">
+        <input type="hidden" name="accountNumber" th:value="${#httpServletRequest.remoteUser}">
+        <input type="submit" value="Transfer" />
+    </form>
+    <form th:action="@{/lastTransaction}" method="get">
+        <input type="hidden" name="accountNumber" th:value="${#httpServletRequest.remoteUser}">
+        <input type="submit" value="Last Transaction" />
+    </form>
+    <form th:action="@{/allTransaction}" method="get">
+        <input type="hidden" name="accountNumber" th:value="${#httpServletRequest.remoteUser}">
+        <input type="submit" value="All Transaction" />
+    </form><br>
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Logout" />
+    </form>
+
+</body>
+</html>

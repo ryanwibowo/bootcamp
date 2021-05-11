@@ -7,7 +7,11 @@ import com.atm.repository.AccountRepository;
 import com.atm.repository.TransactionRepository;
 import com.atm.utils.AtmUtil;
 import com.atm.validation.Validation;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -46,13 +50,14 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public Transaction processTransfer(String accountNumber, String destinationNumber, BigDecimal amount) throws Exception {
         Account account = accountService.getAccount(accountNumber);
         Account destinationAccount = accountService.getAccount(destinationNumber);
         return processTransfer(account, destinationAccount, amount);
     }
 
-    public Transaction setTransactionHistory(TransactionType transactionType, BigDecimal balance, LocalDateTime date,
+    private Transaction setTransactionHistory(TransactionType transactionType, BigDecimal balance, LocalDateTime date,
                                       String accountNumber, String destinationAccount) {
         Transaction transaction = new Transaction();
         transaction.setTransactionType(transactionType);
@@ -68,6 +73,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    @Transactional
     public Transaction processWithdraw(Account account, BigDecimal balance) throws Exception {
         Validation validation = new Validation();
         validation.isBalanceEnough(account.getBalance(), balance);
@@ -77,5 +83,11 @@ public class TransactionServiceImpl implements TransactionService {
         accountRepository.save(account);
         return setTransactionHistory(TransactionType.WITHDRAW, balance, date, account.getAccountNumber(),
                 null);
+    }
+
+    @Override
+    public Page<Transaction> findPaginated(String accountNumber, int currentPage, int pageSize) {
+        Pageable pageable = PageRequest.of(currentPage - 1, pageSize);
+        return transactionRepository.findByAccountNumberOrderByTransactionDateDesc(accountNumber, pageable);
     }
 }

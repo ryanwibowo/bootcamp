@@ -14,12 +14,7 @@
         <p th:text="'Account Number : ' + ${account.accountNumber}"></p>
         </div>
     </form>
-    <form th:action="@{/login}" th:object="${account}" method="get">
-        <input type="hidden" th:field="*{accountNumber}">
-        <input type="hidden" th:field="*{pin}">
-        <input type="submit" value="Transaction" />
-    </form><br>
-    <form action="index.html" method="get">
+    <form th:action="@{/logout}" method="post">
         <input type="submit" value="Logout" />
     </form>
 </body>
