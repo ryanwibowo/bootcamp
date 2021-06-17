@@ -64,6 +64,10 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
         <!-- JPA Data (We are going to use Repositories, Entities, Hibernate, etc...) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

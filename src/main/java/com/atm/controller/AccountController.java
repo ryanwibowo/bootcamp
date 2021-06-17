@@ -27,7 +27,6 @@ public class AccountController {
     @PostMapping("/getAccountFromFile")
     public ResponseEntity<List<Account>> getAccountFromFile(@Validated @RequestParam String file) {
         List<Account> accounts = accountService.getAccountFromFile(file);
-        accountRepository.saveAll(accounts);
         return ResponseEntity.ok(accounts);
     }
 }

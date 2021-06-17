@@ -63,6 +63,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
             accounts.add(new Account(1l, "John Doe", "012108", BigDecimal.valueOf(30), "112233"));
             accounts.add(new Account(2l, "Jane Doe", "932012", BigDecimal.valueOf(30), "112244"));
         }
+        accountRepository.saveAll(accounts);
         return accounts;
     }
 
