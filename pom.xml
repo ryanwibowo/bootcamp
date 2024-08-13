@@ -23,12 +23,12 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
+            <version>1.18.28</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>28.2-android</version>
+            <version>32.0.0-android</version>
         </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
@@ -38,7 +38,7 @@
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-            <version>5.3</version>
+            <version>5.8</version>
         </dependency>
     </dependencies>
 
