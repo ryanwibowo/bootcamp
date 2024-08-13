@@ -4,12 +4,12 @@ import java.math.BigDecimal;
 
 public class AtmUtil {
 
-    public BigDecimal subtractBalance(BigDecimal currentBalance, String amount) {
-        return currentBalance.subtract(new BigDecimal(amount));
+    public BigDecimal subtractBalance(BigDecimal currentBalance, BigDecimal amount) {
+        return currentBalance.subtract(amount);
     }
 
-    public BigDecimal addBalance(BigDecimal currentBalance, String amount) {
-        return currentBalance.add(new BigDecimal(amount));
+    public BigDecimal addBalance(BigDecimal currentBalance, BigDecimal amount) {
+        return currentBalance.add(amount);
     }
 
     public long getReferenceNumber() {

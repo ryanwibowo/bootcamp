@@ -1,18 +1,27 @@
 package pages;
 
 import model.Account;
-import validation.Validation;
+import service.AccountService;
+import service.TransactionService;
 
 import java.math.BigDecimal;
 import java.util.Scanner;
 
 public class WithdrawScreen {
 
+    private AccountService accountService;
+    private TransactionService transactionService;
+
+    public WithdrawScreen(AccountService accountService, TransactionService transactionService) {
+
+        this.accountService = accountService;
+        this.transactionService = transactionService;
+    }
+
     public void process(Account account) {
-        Validation validate = new Validation();
-        TransactionScreen transactionScreen = new TransactionScreen();
-        SummaryScreen summaryScreen = new SummaryScreen();
-        OtherWithdrawScreen otherWithdrawScreen = new OtherWithdrawScreen();
+        TransactionScreen transactionScreen = new TransactionScreen(accountService, transactionService);
+        WithdrawSummary withdrawSummary = new WithdrawSummary(accountService, transactionService);
+        OtherWithdrawScreen otherWithdrawScreen = new OtherWithdrawScreen(accountService, transactionService);
         Scanner opt = new Scanner(System.in);
         opt.reset();
         try {
@@ -27,16 +36,13 @@ public class WithdrawScreen {
             System.out.print("Please choose option[5]: ");
             switch (opt.nextLine()) {
                 case "1":
-                    validate.isBalanceEnough(account.getBalance(), amount10);
-                    summaryScreen.process(account, amount10.toString());
+                    withdrawSummary.process(account, amount10);
                     break;
                 case "2":
-                    validate.isBalanceEnough(account.getBalance(), amount50);
-                    summaryScreen.process(account, amount50.toString());
+                    withdrawSummary.process(account, amount50);
                     break;
                 case "3":
-                    validate.isBalanceEnough(account.getBalance(), amount100);
-                    summaryScreen.process(account, amount100.toString());
+                    withdrawSummary.process(account, amount100);
                     break;
                 case "4":
                     otherWithdrawScreen.process(account);

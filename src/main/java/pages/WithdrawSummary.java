@@ -1,36 +1,43 @@
 package pages;
 
 import model.Account;
+import model.TransactionType;
 import service.AccountService;
 import service.TransactionService;
+import utils.AtmUtil;
+import validation.Validation;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.Scanner;
 
-public class FundTransferSummary {
+public class WithdrawSummary {
 
     private TransactionService transactionService;
     private AccountService accountService;
 
-    public FundTransferSummary(AccountService accountService, TransactionService transactionService) {
+    public WithdrawSummary(AccountService accountService, TransactionService transactionService) {
+
         this.accountService = accountService;
         this.transactionService = transactionService;
     }
 
-    public void process(Account account, String destination, BigDecimal amount, long refNumber) throws Exception {
+    public void process(Account account, BigDecimal balance) throws Exception {
         TransactionScreen transactionScreen = new TransactionScreen(accountService, transactionService);
+        AtmUtil util = new AtmUtil();
+        Validation validate = new Validation();
         LoginScreen loginScreen = new LoginScreen(accountService, transactionService);
+        validate.isBalanceEnough(account.getBalance(), balance);
         Scanner opt = new Scanner(System.in);
+        BigDecimal currentBalance = util.subtractBalance(account.getBalance(), balance);
+        account.setBalance(currentBalance);
         LocalTime date = LocalTime.now();
-        Account destinationAccount = accountService.getAccount(destination);
-        destinationAccount = transactionService.processTransfer(account, amount, date, destinationAccount);
-        System.out.println("Fund Transfer Summary");
-        System.out.println("Transaction Date    : " + date);
-        System.out.println("Destination Account : " + destination);
-        System.out.println("Transfer Amount     : " + amount);
-        System.out.println("Reference Number    : " + refNumber);
-        System.out.println("Balance             : " + destinationAccount.getBalance());
+        transactionService.setTransactionHistory(TransactionType.WITHDRAW, balance, date,
+                account.getAccountNumber(), null);
+        System.out.println("Summary");
+        System.out.println("Date : " + date);
+        System.out.println("Withdraw : " + balance);
+        System.out.println("Balance : " + currentBalance);
         System.out.println("1. Transaction");
         System.out.println("2. Exit");
         System.out.print("Please choose option[2]: ");

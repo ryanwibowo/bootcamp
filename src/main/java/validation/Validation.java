@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 public class Validation {
 
-    private AccountService accountService = AccountService.getAccountService();
+    private AccountService accountService = AccountService.getAccountService(null);
 
     public void validate(String value) throws Exception {
         if (value.length() != 6) {

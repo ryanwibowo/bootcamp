@@ -1,14 +1,23 @@
 package pages;
 
 import model.Account;
+import service.AccountService;
+import service.TransactionService;
 import validation.Validation;
 
 import java.util.Scanner;
 
 public class LoginScreen {
+    private AccountService accountService;
+    private TransactionService transactionService;
+
+    public LoginScreen(AccountService accountService, TransactionService transactionService) {
+        this.accountService = accountService;
+        this.transactionService = transactionService;
+    }
 
     public void process() {
-        TransactionScreen transactionScreen = new TransactionScreen();
+        TransactionScreen transactionScreen = new TransactionScreen(accountService, transactionService);
         Validation validate = new Validation();
         Scanner acc = new Scanner(System.in);
         acc.reset();
