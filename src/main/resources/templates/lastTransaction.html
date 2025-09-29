@@ -3,28 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <title>Last Transaction</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
-    <h1>Last Transaction</h1>
-    <form action="#" th:object="${transactionList}">
-        <th:block th:if="${transactionList.transactions} == null">No History Transaction</th:block>
-        <table>
-            <tr>
-                <th>No</th>
-                <th>Transaction Date</th>
-                <th>Transaction Type</th>
-                <th>Amount</th>
-            </tr>
-            <tr th:each="transaction, stat : ${transactionList.transactions}">
-                <td th:text="${stat.index + 1}">No</td>
-                <td th:text="${transaction.transactionDate}">Transaction Date</td>
-                <td th:text="${transaction.transactionType}">Transaction Type</td>
-                <td th:text="${transaction.amount}">Amount</td>
-            </tr>
-        </table>
-    </form><br>
-    <form action="index.html" method="get">
-        <input type="submit" value="Logout" />
-    </form>
+<h1>Last Transaction</h1>
+
+<!-- Account Information -->
+<div>
+    <h3>Account Information</h3>
+    <p><strong>Account Number:</strong> <span th:text="${lastTransaction.account.accountNumber}"></span></p>
+    <p><strong>Account Name  :</strong> <span th:text="${lastTransaction.account.name}"></span></p>
+    <p><strong>Balance       :</strong> $<span th:text="${lastTransaction.account.balance}"></span></p>
+</div>
+
+<!-- Transaction List -->
+<div>
+    <h3>Transaction History (Last 10)</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>No</th>
+            <th>Date</th>
+            <th>Transaction Type</th>
+            <th>Amount</th>
+            <th>Account Balance</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="transaction, stat : ${lastTransaction.transactions}">
+            <td th:text="${stat.index + 1}"></td>
+            <td th:text="${#temporals.format(transaction.transactionDate, 'dd-MM-yyyy HH:mm')}"></td>
+            <td th:text="${transaction.transactionType}"></td>
+            <td th:text="${#numbers.formatDecimal(transaction.amount, 1, 'COMMA', 2, 'POINT')}"></td>
+            <td th:text="${#numbers.formatDecimal(transaction.displayBalance, 1, 'COMMA', 2, 'POINT')}"></td>
+        </tr>
+
+        <!--<tr th:each="transaction, stat : ${lastTransaction.transactions}">
+            <td th:text="${stat.index + 1}">1</td>
+            <td th:text="${#temporals.format(transaction.transactionDate, 'yyyy-MM-dd HH:mm')}">2025-09-17</td>
+            <td th:text="${transaction.transactionType}">Withdraw</td>
+            <td th:text="${transaction.amount}">$100</td>
+        </tr>-->
+        </tbody>
+    </table>
+</div>
+
+<br>
+<form action="index.html" method="get">
+    <input type="submit" value="Logout" />
+</form>
 </body>
 </html>

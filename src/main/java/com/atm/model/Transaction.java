@@ -1,46 +1,35 @@
 package com.atm.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.atm.model.enums.TransactionType;
+import jakarta.persistence.*;
+import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Transaction {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private TransactionType transactionType;
+
+    private String transactionType;
+
     @Column(precision = 0)
     private BigDecimal amount;
+
     private LocalDateTime transactionDate;
+
     private String accountNumber;
-    private String destinationAccount;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Transaction that = (Transaction) o;
-        return Objects.equals(id, that.id) &&
-                transactionType == that.transactionType &&
-                Objects.equals(amount.intValue(), that.amount.intValue()) &&
-                Objects.equals(transactionDate, that.transactionDate) &&
-                Objects.equals(accountNumber, that.accountNumber) &&
-                Objects.equals(destinationAccount, that.destinationAccount);
-    }
+    private String destinationNumber;
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, transactionType, amount, transactionDate, accountNumber, destinationAccount);
-    }
+    private BigDecimal accountBalance;
+
+    private BigDecimal displayBalance;
 }

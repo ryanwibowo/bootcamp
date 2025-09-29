@@ -5,25 +5,30 @@
     <title>Withdraw</title>
 </head>
 <body>
-    <h1>Select Nominal</h1>
-    <form action="#" th:action="@{/processWithdraw}" th:object="${account}" method="post">
-        <input type="hidden" th:field="*{accountNumber}">
-        <input type="hidden" name="balance" value="10">
-        <input type="submit" value="$10" />
-    </form>
-    <form action="#" th:action="@{/processWithdraw}" th:object="${account}" method="post">
-        <input type="hidden" th:field="*{accountNumber}">
-        <input type="hidden" name="balance" value="50">
-        <input type="submit" value="$50" />
-    </form>
-    <form action="#" th:action="@{/processWithdraw}" th:object="${account}" method="post">
-        <input type="hidden" th:field="*{accountNumber}">
-        <input type="hidden" name="balance" value="100">
-        <input type="submit" value="$100" />
-    </form>
-    <form action="#" th:action="@{/otherWithdraw}" th:object="${account}" method="get">
-        <input type="hidden" th:field="*{accountNumber}">
-        <input type="submit" value="Others" />
-    </form>
+<h1>Select Nominal</h1>
+
+<form th:action="@{/processWithdraw}" method="post">
+    <input type="hidden" name="accountNumber" th:value="${transactionRequest.accountNumber}">
+    <input type="hidden" name="amount" value="10">
+    <input type="submit" value="$10" />
+</form>
+
+<form th:action="@{/processWithdraw}" method="post">
+    <input type="hidden" name="accountNumber" th:value="${transactionRequest.accountNumber}">
+    <input type="hidden" name="amount" value="50">
+    <input type="submit" value="$50" />
+</form>
+
+<form th:action="@{/processWithdraw}" method="post">
+    <input type="hidden" name="accountNumber" th:value="${transactionRequest.accountNumber}">
+    <input type="hidden" name="amount" value="100">
+    <input type="submit" value="$100" />
+</form>
+
+<!-- Other Withdraw -->
+<form th:action="@{/otherWithdraw}" method="get">
+    <input type="hidden" name="accountNumber" th:value="${transactionRequest.accountNumber}">
+    <input type="submit" value="Others" />
+</form>
 </body>
 </html>

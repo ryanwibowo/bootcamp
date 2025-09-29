@@ -5,22 +5,18 @@
     <title>Withdraw Summary</title>
 </head>
 <body>
-    <h1>Withdraw Summary</h1>
-    <form action="#" th:object="${account}">
-        <div th:object="${transaction}">
-        <p th:text="'Date           : ' + ${transaction.transactionDate}"></p>
-        <p th:text="'Withdraw       : ' + ${transaction.amount}"></p>
-        <p th:text="'Balance        : ' + ${account.balance}"></p>
-        <p th:text="'Account Number : ' + ${account.accountNumber}"></p>
-        </div>
-    </form>
-    <form th:action="@{/login}" th:object="${account}" method="get">
-        <input type="hidden" th:field="*{accountNumber}">
-        <input type="hidden" th:field="*{pin}">
-        <input type="submit" value="Transaction" />
-    </form><br>
-    <form action="index.html" method="get">
-        <input type="submit" value="Logout" />
-    </form>
+<h1>Withdraw Summary</h1>
+
+<div th:object="${transaction}">
+    <p th:text="'Date           : ' + *{transactionDate}"></p>
+    <p th:text="'Transaction    : ' + *{transactionType}"></p>
+    <p th:text="'Withdraw       : $' + *{amount}"></p>
+    <p th:text="'Balance        : $' + *{accountBalance}"></p>
+    <p th:text="'Account Number : ' + *{accountNumber}"></p>
+</div>
+
+<form action="/" method="get">
+    <input type="submit" value="Back to Home" />
+</form>
 </body>
 </html>

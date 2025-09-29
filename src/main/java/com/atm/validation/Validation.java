@@ -1,55 +1,49 @@
 package com.atm.validation;
 
+import com.atm.exception.ValidationException;
 import com.atm.model.Account;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 
 @Service
 public class Validation {
 
-    public void validate(Account account, Account destinationAccount, BigDecimal amount) throws Exception {
-        validateRegex(destinationAccount.getAccountNumber(), amount);
-        validateAccount(account, destinationAccount.getAccountNumber());
-        validateAmount(account.getBalance(), amount);
+    private static final BigDecimal MAX_WITHDRAW_AMOUNT = BigDecimal.valueOf(1000);
+
+    public void validate(Account sourceAccount, Account destinationAccount, BigDecimal amount) {
+        validateDestination(destinationAccount.getAccountNumber());
+        validateAmount(amount);
+        validateNotSameAccount(sourceAccount, destinationAccount.getAccountNumber());
+        validateBalance(sourceAccount.getBalance(), amount);
     }
 
-    public void validateRegex(String destinationNumber, BigDecimal amount) throws Exception {
-        if (destinationNumber.isEmpty() || amount.compareTo(BigDecimal.ZERO) == 0) {
-            throw new Exception("Value can't be empty or 0");
-        }
-        if (!destinationNumber.matches("^[0-9]+$")) {
-            throw new Exception("Value should only contains numbers");
-        }
-    }
-
-    public void isBalanceEnough(BigDecimal currentBalance, BigDecimal amount) throws Exception {
+    public void validateBalance(BigDecimal currentBalance, BigDecimal amount) {
         if (currentBalance.compareTo(amount) < 0) {
-            throw new Exception("Insufficient balance $" + currentBalance);
+            throw new ValidationException("Insufficient balance. Current: $" + currentBalance + ", Required: $" + amount);
         }
     }
 
-    public void validateBalance(BigDecimal currentBalance, String value) throws Exception {
-        BigDecimal amount = new BigDecimal(value);
-        if (Integer.valueOf(value) % 10 > 0) {
-            throw new Exception("Invalid amount");
+    private void validateDestination(String destinationNumber) {
+        if (destinationNumber == null || destinationNumber.isEmpty()) {
+            throw new ValidationException("Destination account number cannot be empty");
         }
-        if (amount.compareTo(BigDecimal.valueOf(1000l)) > 0) {
-            throw new Exception("Maximum amount to withdraw is $1000");
+        if (!destinationNumber.matches("^\\d+$")) {
+            throw new ValidationException("Destination account number must contain only digits");
         }
-        isBalanceEnough(currentBalance, amount);
     }
 
-    public void validateAmount(BigDecimal currentBalance, BigDecimal amount) throws Exception {
-        if (amount.compareTo(BigDecimal.valueOf(1000l)) > 0) {
-            throw new Exception("Maximum amount to withdraw is $1000");
+    private void validateAmount(BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new ValidationException("Amount must be greater than 0");
         }
-        isBalanceEnough(currentBalance, amount);
+        if (amount.compareTo(MAX_WITHDRAW_AMOUNT) > 0) {
+            throw new ValidationException("Maximum withdrawal amount is $1000. Requested: $" + amount);
+        }
     }
 
-    public void validateAccount(Account account, String destinationNumber) throws Exception {
+    private void validateNotSameAccount(Account account, String destinationNumber) {
         if (account.getAccountNumber().equals(destinationNumber)) {
-            throw new Exception("Source and destination is same account");
+            throw new ValidationException("Source and destination accounts cannot be the same");
         }
     }
 }

@@ -6,12 +6,12 @@
 </head>
 <body>
     <h1>Other Withdraw</h1>
-    <form action="#" th:action="@{/processWithdraw}" th:object="${account}" method="post">
+    <form action="#" th:action="@{/processWithdraw}" method="post">
         <table>
-            <tr><td><input type="hidden" th:field="*{accountNumber}"></td></tr>
+            <tr><td><input type="hidden" name="accountNumber" th:value="${transactionRequest.accountNumber}"></td></tr>
             <tr>
                 <td>Enter amount to withdraw : </td>
-                <td><input type='number' name='balance' /></td>
+                <td><input type='number' name='amount' /></td>
             </tr>
             <tr><td><input type="submit" value="Process"/></td></tr>
         </table>

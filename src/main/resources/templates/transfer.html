@@ -6,7 +6,7 @@
 </head>
 <body>
     <h1>Transfer</h1>
-    <form action="#" th:action="@{/processTransfer}" th:object="${account}" method="get">
+    <form action="#" th:action="@{/processTransfer}" th:object="${account}" method="post">
         <table>
             <tr><td><input type="hidden" th:field="*{accountNumber}"></td></tr>
             <tr>

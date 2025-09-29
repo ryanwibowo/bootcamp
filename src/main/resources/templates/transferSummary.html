@@ -6,22 +6,28 @@
 </head>
 <body>
 <h1>Transfer Summary</h1>
-<form action="#" th:object="${account}">
-    <div th:object="${transaction}">
-        <p th:text="'Transaction Date    : ' + ${transaction.transactionDate}"></p>
-        <p th:text="'Destination Account : ' + ${transaction.destinationAccount}"></p>
-        <p th:text="'Transfer Amount     : ' + ${transaction.amount}"></p>
-        <p th:text="'Balance             : ' + ${account.balance}"></p>
-        <p th:text="'Account Number      : ' + ${account.accountNumber}"></p>
-    </div>
-</form>
-<form th:action="@{/login}" th:object="${account}" method="get">
-    <input type="hidden" th:field="*{accountNumber}">
-    <input type="hidden" th:field="*{pin}">
-    <input type="submit" value="Transaction" />
+
+<div th:object="${transfer}">
+    <p th:text="'Transaction Type    : ' + *{transactionType}"></p>
+    <p th:text="'Transaction Date    : ' + *{transactionDate}"></p>
+    <p th:text="'Source Account      : ' + *{accountNumber}"></p>
+    <p th:text="'Destination Account : ' + *{destinationNumber}"></p>
+    <p th:text="'Transfer Amount     : ' + *{amount}"></p>
+    <p th:text="'Remaining Balance   : ' + *{accountBalance}"></p>
+</div>
+
+<!-- Continue Transaction -->
+<form th:action="@{/login}" th:object="${loginRequest}" method="post">
+    <input type="hidden" name="accountNumber" th:value="${transfer.account.accountNumber}">
+    <input type="hidden" name="pin" th:value="${transfer.account.pin}">
+    <input type="hidden" name="firstLogin" value="false" />
+    <input type="submit" value="New Transaction" />
 </form><br>
-<form action="index.html" method="get">
+
+<!-- Logout -->
+<form th:action="@{/}" method="get">
     <input type="submit" value="Logout" />
 </form>
+
 </body>
 </html>

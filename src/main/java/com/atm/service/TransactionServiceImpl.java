@@ -2,80 +2,120 @@ package com.atm.service;
 
 import com.atm.model.Account;
 import com.atm.model.Transaction;
-import com.atm.model.TransactionType;
+import com.atm.model.dto.*;
+import com.atm.model.enums.TransactionType;
 import com.atm.repository.AccountRepository;
 import com.atm.repository.TransactionRepository;
 import com.atm.utils.AtmUtil;
 import com.atm.validation.Validation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
 
-    private AccountRepository accountRepository;
+    private final AccountRepository accountRepository;
 
-    private TransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
 
-    private AccountService accountService;
+    private final AccountService accountService;
 
-    public TransactionServiceImpl(AccountRepository accountRepository, TransactionRepository transactionRepository,
-                                  AccountService accountService) {
-        this.accountRepository = accountRepository;
-        this.transactionRepository = transactionRepository;
-        this.accountService = accountService;
-    }
+    private final Validation validation;
 
-    private Transaction processTransfer(Account account, Account destinationAccount, BigDecimal amount) throws Exception {
-        Validation validation = new Validation();
-        validation.validate(account, destinationAccount, amount);
-        LocalDateTime date = LocalDateTime.now();
-        AtmUtil util = new AtmUtil();
-        BigDecimal currentBalance = util.subtractBalance(account.getBalance(), amount);
-        account.setBalance(currentBalance);
-        destinationAccount.setBalance(util.addBalance(destinationAccount.getBalance(), amount));
+    @Override
+    @Transactional
+    public WithdrawResponse processWithdraw(WithdrawRequest request) {
+        Account account = accountService.getAccount(request.getAccountNumber());
+        validation.validateBalance(account.getBalance(), request.getAmount());
+
+        BigDecimal newBalance = account.getBalance().subtract(request.getAmount());
+        account.setBalance(newBalance);
         accountRepository.save(account);
-        accountRepository.save(destinationAccount);
-        setTransactionHistory(TransactionType.FUND_TRANSFER_CREDIT, amount, date, destinationAccount.getAccountNumber(),
-                account.getAccountNumber());
-        return setTransactionHistory(TransactionType.FUND_TRANSFER_DEBIT, amount, date, account.getAccountNumber(),
-                destinationAccount.getAccountNumber());
+
+        Transaction transaction = setTransaction(TransactionType.WITHDRAW, account.getAccountNumber(),
+                null, request.getAmount(), newBalance, newBalance);
+        transactionRepository.save(transaction);
+
+        return WithdrawResponse.builder()
+                .transactionType(TransactionType.WITHDRAW)
+                .transactionDate(transaction.getTransactionDate())
+                .accountNumber(account.getAccountNumber())
+                .amount(request.getAmount())
+                .accountBalance(newBalance)
+                .build();
     }
 
     @Override
-    public Transaction processTransfer(String accountNumber, String destinationNumber, BigDecimal amount) throws Exception {
+    @Transactional
+    public TransferResponse processTransfer(TransferRequest request) {
+        Account account = accountService.getAccount(request.getAccountNumber());
+        Account destination = accountService.getAccount(request.getDestinationNumber());
+        validation.validate(account, destination, request.getAmount());
+
+        BigDecimal newBalance = AtmUtil.subtractBalance(account.getBalance(), request.getAmount());
+        account.setBalance(newBalance);
+        destination.setBalance(AtmUtil.addBalance(destination.getBalance(), request.getAmount()));
+        accountRepository.save(account);
+        accountRepository.save(destination);
+
+        List<Transaction> transactionList = new ArrayList<>();
+        transactionList.add(setTransaction(TransactionType.TRANSFER, account.getAccountNumber(),
+                destination.getAccountNumber(), request.getAmount(), newBalance, destination.getBalance()));
+        transactionRepository.saveAll(transactionList);
+
+        return TransferResponse.builder()
+                .account(account)
+                .transactionType(TransactionType.WITHDRAW)
+                .transactionDate(transactionList.stream().map(Transaction::getTransactionDate).findFirst()
+                        .orElse(LocalDateTime.now()))
+                .accountNumber(account.getAccountNumber())
+                .destinationNumber(destination.getAccountNumber())
+                .amount(request.getAmount())
+                .accountBalance(newBalance)
+                .build();
+    }
+
+    public LastTransactionResponse getLast10Transaction(String accountNumber) {
         Account account = accountService.getAccount(accountNumber);
-        Account destinationAccount = accountService.getAccount(destinationNumber);
-        return processTransfer(account, destinationAccount, amount);
+        List<Transaction> transactions = transactionRepository
+                .getTop10ByAccountNumberOrDestinationNumberOrderByTransactionDateAsc(accountNumber, accountNumber);
+
+        for (Transaction transaction : transactions) {
+            if (transaction.getDestinationNumber() == null) {
+                transaction.setTransactionType(TransactionType.WITHDRAW.toString());
+                transaction.setDisplayBalance(transaction.getAccountBalance());
+            } else if (transaction.getAccountNumber().equals(account.getAccountNumber())) {
+                transaction.setTransactionType("TRANSFER_DEBIT");
+                transaction.setDisplayBalance(transaction.getAccountBalance());
+            } else {
+                transaction.setTransactionType("TRANSFER_CREDIT");
+                transaction.setDisplayBalance(transaction.getDisplayBalance());
+            }
+        }
+
+        LastTransactionResponse response = new LastTransactionResponse();
+        response.setAccount(account);
+        response.setTransactions(transactions);
+        return response;
     }
 
-    public Transaction setTransactionHistory(TransactionType transactionType, BigDecimal balance, LocalDateTime date,
-                                      String accountNumber, String destinationAccount) {
-        Transaction transaction = new Transaction();
-        transaction.setTransactionType(transactionType);
-        transaction.setAmount(balance);
-        transaction.setTransactionDate(date);
-        transaction.setAccountNumber(accountNumber);
-        transaction.setDestinationAccount(destinationAccount);
-        return transactionRepository.save(transaction);
-    }
-
-    public List<Transaction> getLast10Transaction(String accountNumber) {
-        return transactionRepository.getTop10ByAccountNumberOrderByTransactionDateDesc(accountNumber);
-    }
-
-    @Override
-    public Transaction processWithdraw(Account account, BigDecimal balance) throws Exception {
-        Validation validation = new Validation();
-        validation.isBalanceEnough(account.getBalance(), balance);
-        BigDecimal currentBalance = AtmUtil.subtractBalance(account.getBalance(), balance);
-        account.setBalance(currentBalance);
-        LocalDateTime date = LocalDateTime.now();
-        accountRepository.save(account);
-        return setTransactionHistory(TransactionType.WITHDRAW, balance, date, account.getAccountNumber(),
-                null);
+    private Transaction setTransaction(TransactionType transactionType, String account, String beneficiary,
+                                       BigDecimal amount, BigDecimal newBalance, BigDecimal displayBalance) {
+        return Transaction.builder()
+                .transactionType(transactionType.toString())
+                .transactionDate(LocalDateTime.now())
+                .accountNumber(account)
+                .destinationNumber(beneficiary)
+                .amount(amount)
+                .accountBalance(newBalance)
+                .displayBalance(displayBalance)
+                .build();
     }
 }

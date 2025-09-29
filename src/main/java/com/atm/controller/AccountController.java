@@ -1,8 +1,8 @@
 package com.atm.controller;
 
 import com.atm.model.Account;
-import com.atm.repository.AccountRepository;
 import com.atm.service.AccountService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,23 +11,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-
 @RestController
+@RequiredArgsConstructor
 public class AccountController {
 
-    private AccountService accountService;
+    private final AccountService accountService;
 
-    private AccountRepository accountRepository;
-
-    public AccountController(AccountService accountService, AccountRepository accountRepository) {
-        this.accountService = accountService;
-        this.accountRepository = accountRepository;
-    }
-
-    @PostMapping("/getAccountFromFile")
-    public ResponseEntity<List<Account>> getAccountFromFile(@Validated @RequestParam String file) {
-        List<Account> accounts = accountService.getAccountFromFile(file);
-        accountRepository.saveAll(accounts);
+    @PostMapping("/dumpAccountFromFileAndSaveToDatabase")
+    public ResponseEntity<List<Account>> dumpAccountFromFileAndSaveToDatabase(
+            @Validated @RequestParam("file") String file) {
+        List<Account> accounts = accountService.dumpAccountFromFileAndSaveToDatabase(file);
         return ResponseEntity.ok(accounts);
     }
 }

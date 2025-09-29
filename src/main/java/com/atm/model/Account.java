@@ -1,12 +1,11 @@
 package com.atm.model;
 
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
@@ -15,6 +14,8 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,20 +28,9 @@ public class Account {
 
     private BigDecimal balance;
 
-    @Pattern(regexp = "^[0-9]+$", message = "Account Number should only contains numbers")
+    @Pattern(regexp = "^\\d+$", message = "Account Number should only contains numbers")
     @Digits(integer=6, fraction = 0, message = "Account Number should have 6 digits length")
     private String accountNumber;
-
-    public Account() {
-        super();
-    }
-    public Account(Long id, String name, String pin, BigDecimal balance, String accountNumber) {
-        this.id = id;
-        this.name = name;
-        this.pin = pin;
-        this.balance = balance;
-        this.accountNumber = accountNumber;
-    }
 
     @Override
     public boolean equals(Object o) {
