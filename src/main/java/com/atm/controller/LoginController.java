@@ -14,11 +14,6 @@ public class LoginController {
 
     private final AccountService accountService;
 
-    @GetMapping("/")
-    public String index() {
-        return "index";
-    }
-
     @PostMapping("/login")
     public String login(@ModelAttribute LoginRequest request, Model attributes) {
         Account account = accountService.validateLogin(request);
